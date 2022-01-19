@@ -21,6 +21,3 @@ class Usuario(db.Model):
     
     def __repr__(self):
         return f"{self.apellido}, {self.nombre}: ID= {self.ID}"
-
-
-
