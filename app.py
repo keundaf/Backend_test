@@ -6,12 +6,15 @@ from datetime import datetime
 from email_validator import validate_email, EmailNotValidError
 
 app = Flask(__name__)
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:Kibernum@localhost/usuarios'
+# configuracion de base de datos
+user_psql = 'postgres'
+pass_psql = 'Kibernum'
+baseDdatos = 'usuarios'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://'+user_psql+':'+pass_psql+'@localhost/'+baseDdatos
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 db.init_app(app)
- 
+
+# crea tabla [EXPLICAR BIEN] 
 @app.before_first_request
 def create_table():
     db.create_all()
@@ -47,12 +50,11 @@ def create():
         if correo:
             return jsonify({"message": "correo duplicado"}),400
         
+        # validar fecha
         Fecha_str = usuario_nuevo["Fecha_nacimiento"]
-
- 
         hoy = datetime.now()
         try:
-            Fecha_nacimiento = datetime.strptime(Fecha_str, '%Y-%m-%d') # utilizar regex
+            Fecha_nacimiento = datetime.strptime(Fecha_str, '%Y-%m-%d')
             if hoy<Fecha_nacimiento:
                 return jsonify({"message": "Bienvenido hombre del futuro"}),400
         except:
@@ -61,9 +63,7 @@ def create():
         usuario = Usuario(ID_usuario,nombre_usuario, apellido_usuario, email_usuario, Fecha_nacimiento)
         db.session.add(usuario)
         db.session.commit()
-        usuario_salida = {"ID":ID_usuario,"nombre":nombre_usuario,"apellido":apellido_usuario,"correo":email_usuario,"Fecha_nacimiento":Fecha_str}
-        
-        return jsonify(usuario_salida),201
+        return jsonify(User2dic(usuario)),201
 
 @app.route('/usuarios/<string:id>', methods=['GET','PUT','DELETE'])
 def RetrieveSingleEmployee(id):
@@ -75,35 +75,41 @@ def RetrieveSingleEmployee(id):
     if request.method == 'PUT':
         #actualizacion completa
         usuario_requerido= request.json
-        id=usuario_requerido["ID"]
         mail=usuario_requerido["correo"]
         
         '''llamo el usuario existente'''
 
-        correo = Usuario.query.filter_by(Email=mail).first()
+        usuario_bycorreo = Usuario.query.filter_by(Email=mail).first()
 
-        if (usuario and not correo) or (usuario==correo):
-            db.session.delete(usuario)
-            db.session.commit()
+        if (usuario and not usuario_bycorreo) or (usuario==usuario_bycorreo):
             #DATA
             ID_usuario = id
             nombre_usuario = usuario_requerido["nombre"]
             apellido_usuario = usuario_requerido["apellido"]
             email_usuario = usuario_requerido["correo"]
-            Fecha_str = usuario_requerido["Fecha_nacimiento"]
-            Fecha_nacimiento = datetime.strptime(Fecha_str, '%Y-%m-%d')
-            #ALMACENAR
 
+
+            # validar fecha
+            Fecha_str = usuario_requerido["Fecha_nacimiento"]
+            hoy = datetime.now()
+            try:
+                Fecha_nacimiento = datetime.strptime(Fecha_str, '%Y-%m-%d')
+                if hoy<Fecha_nacimiento:
+                    return jsonify({"message": "Bienvenido hombre del futuro"}),400
+            except:
+                return jsonify({"message": "Fecha no valida"}),400
+            db.session.delete(usuario)
+            db.session.commit()
+            #ALMACENAR
             usuario = Usuario(ID_usuario,nombre_usuario, apellido_usuario, email_usuario, Fecha_nacimiento)
             db.session.add(usuario)
             db.session.commit()
-
-            return redirect('/data')
+            return jsonify(User2dic(usuario)),200
         else:
             if not usuario:
-                return "Usuario no Existe",404
-            if correo:
-                return "Correo existente"
+                return jsonify({"message": "Usuario no existe"}),404
+            if usuario_bycorreo:
+                return jsonify({"message": "Email duplicado"}),400
 
     if request.method == 'DELETE':
         if usuario:
@@ -113,39 +119,5 @@ def RetrieveSingleEmployee(id):
         else:
             return jsonify({"message": "id de usuario no encontrado"}),404
 
-@app.route('/usuario/modificar',methods = ['POST'])
-def update():
-    
-    if request.method == 'POST':
-        usuario_requerido= request.json
-        id=usuario_requerido["ID"]
-        mail=usuario_requerido["correo"]
-        
-        '''llamo el usuario existente'''
-        usuario = Usuario.query.filter_by(ID=id).first()
-        correo = Usuario.query.filter_by(Email=mail).first()
-
-        if (usuario and not correo) or (usuario==correo):
-            db.session.delete(usuario)
-            db.session.commit()
-            #DATA
-            ID_usuario = id
-            nombre_usuario = usuario_requerido["nombre"]
-            apellido_usuario = usuario_requerido["apellido"]
-            email_usuario = usuario_requerido["correo"]
-            Fecha_str = usuario_requerido["Fecha_nacimiento"]
-            Fecha_nacimiento = datetime.strptime(Fecha_str, '%Y-%m-%d')
-            #ALMACENAR
-
-            usuario = Usuario(ID_usuario,nombre_usuario, apellido_usuario, email_usuario, Fecha_nacimiento)
-            db.session.add(usuario)
-            db.session.commit()
-
-            return redirect('/data')
-        else:
-            if not usuario:
-                return "Usuario no Existe"
-            if correo:
-                return "Correo existente" 
 
 app.run(host='localhost', port=5000, debug=True)
