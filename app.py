@@ -1,12 +1,8 @@
-import json
-from urllib import response
-from xmlrpc.client import ResponseError
-from flask import Flask,render_template,request,redirect, jsonify
+
+from flask import Flask,request,redirect, jsonify
 from models import db,Usuario,User2dic,Userlist2dic
 import uuid
 from datetime import datetime
-import psycopg2
-
 from email_validator import validate_email, EmailNotValidError
 
 app = Flask(__name__)
@@ -50,9 +46,7 @@ def create():
         correo = Usuario.query.filter_by(Email=email).first()
         if correo:
             return jsonify({"message": "correo duplicado"}),400
-
         
-            
         Fecha_str = usuario_nuevo["Fecha_nacimiento"]
 
  
@@ -64,15 +58,6 @@ def create():
         except:
             return jsonify({"message": "Fecha no valida"}),400
 
-
-
-        
-
-        # if (usuario and not correo) or (usuario==correo):
-
-
-
-        # trabajar en validación (correo y fecha) y agregar verificacion de uniquidad de correo
         usuario = Usuario(ID_usuario,nombre_usuario, apellido_usuario, email_usuario, Fecha_nacimiento)
         db.session.add(usuario)
         db.session.commit()
@@ -80,16 +65,12 @@ def create():
         
         return jsonify(usuario_salida),201
 
-
-
 @app.route('/usuarios/<string:id>', methods=['GET','PUT','DELETE'])
 def RetrieveSingleEmployee(id):
     usuario = Usuario.query.filter_by(ID=id).first()
     if request.method == 'GET':
         if usuario:
             return jsonify(User2dic(usuario)),200
-
-
 
     if request.method == 'PUT':
         #actualizacion completa
@@ -132,10 +113,6 @@ def RetrieveSingleEmployee(id):
         else:
             return jsonify({"message": "id de usuario no encontrado"}),404
 
-
-
-
-
 @app.route('/usuario/modificar',methods = ['POST'])
 def update():
     
@@ -170,7 +147,5 @@ def update():
                 return "Usuario no Existe"
             if correo:
                 return "Correo existente" 
-
-
 
 app.run(host='localhost', port=5000, debug=True)
