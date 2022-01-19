@@ -39,24 +39,32 @@ def create():
         apellido_usuario = usuario_nuevo["apellido"]
 
         email_usuario = usuario_nuevo["correo"]
-        # Validar correo.
+        # Validar correo
         try:
             valid = validate_email(email_usuario)
             email = valid.email
         except EmailNotValidError as e:
             print(str(e))
-            return jsonify({"message": "formato correo no valido"}),400
+            return jsonify({"message": "formato correo no valido: " + str(e)}),400
 
         correo = Usuario.query.filter_by(Email=email).first()
         if correo:
             return jsonify({"message": "correo duplicado"}),400
 
-
+        
             
         Fecha_str = usuario_nuevo["Fecha_nacimiento"]
 
-        Fecha_nacimiento = datetime.strptime(Fecha_str, '%Y-%m-%d') # utilizar regex
-        #ALMACENAR
+ 
+        hoy = datetime.now()
+        try:
+            Fecha_nacimiento = datetime.strptime(Fecha_str, '%Y-%m-%d') # utilizar regex
+            if hoy<Fecha_nacimiento:
+                return jsonify({"message": "Bienvenido hombre del futuro"}),400
+        except:
+            return jsonify({"message": "Fecha no valida"}),400
+
+
 
         
 
