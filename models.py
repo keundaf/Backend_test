@@ -18,10 +18,10 @@ class Usuario(db.Model):
         self.apellido = apellido
         self.Email = Email
         self.Fecha_nacimiento = Fecha_nacimiento.date()
-    '''
+
     def __repr__(self):
         return f"{self.apellido}, {self.nombre}: ID= {self.ID}"
-    '''
+
 
 def Userlist2dic(self):
     json_data = {}
