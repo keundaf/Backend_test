@@ -1,9 +1,10 @@
 import json
 from flask import Flask,render_template,request,redirect, jsonify
-from models import db,Usuario,RKB
+from models import db,Usuario,User2dic,Userlist2dic
 import uuid
 from datetime import datetime
 import psycopg2
+
 
 app = Flask(__name__)
 
@@ -56,7 +57,7 @@ def create():
 def RetrieveDataList():
     Usuarios = Usuario.query.all()
 
-    Lista_Usuarios = RKB(Usuarios)
+    Lista_Usuarios = Userlist2dic(Usuarios)
    
     #return render_template('lista_usuarios.html',Usuarios = Usuarios)
     return jsonify(Lista_Usuarios)
@@ -65,15 +66,12 @@ def RetrieveDataList():
 
 
 
-@app.route('/usuario/<uuid:id>', methods=['GET'])
-def RetrieveSingleEmployee():
+@app.route('/usuario/<string:id>', methods=['GET'])
+def RetrieveSingleEmployee(id):
     if request.method == 'GET':
-        usuario_requerido= request.json
-        id=usuario_requerido["ID"]
         usuario = Usuario.query.filter_by(ID=id).first()
-        if usuario:
-            return render_template('datos.html', usuario = usuario)
-        return f"Usuario con id ={id} no existe"
+        usuario_id = User2dic(usuario)
+        return usuario_id
 
 
 

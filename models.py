@@ -23,17 +23,14 @@ class Usuario(db.Model):
         return f"{self.apellido}, {self.nombre}: ID= {self.ID}"
     '''
 
-def RKB(self):
-    json_data_id = []
-    json_data_nombre = []
-    json_data_apellido = []
-    json_data_email = []
-    json_data_fecha = []
+def Userlist2dic(self):
+    json_data = {}
     for usuario in self:
-        json_data_id.append(usuario.ID)
-        json_data_nombre.append(usuario.nombre)
-        json_data_apellido.append(usuario.apellido)
-        json_data_email.append(usuario.Email)
-        json_data_fecha.append(usuario.Fecha_nacimiento)
-    return {"ID":json_data_id,"nombre":json_data_nombre,"apellido":json_data_apellido,"correo":json_data_email,"Fecha_nacimiento":json_data_fecha}
-        #return {"ID":self.ID,"nombre":self.nombre,"apellido":self.apellido,"correo":self.Email,"Fecha_nacimiento":self.Fecha_nacimiento}
+        json_data[usuario.ID]={"ID":usuario.ID,"apellido":usuario.apellido,"nombre":usuario.nombre,"correo":usuario.Email,"Fecha_nacimiento":usuario.Fecha_nacimiento}
+    return json_data
+
+def User2dic(self):
+    json_data = {}
+    json_data[self.ID]={"ID":self.ID,"apellido":self.apellido,"nombre":self.nombre,"correo":self.Email,"Fecha_nacimiento":self.Fecha_nacimiento}
+    return json_data
+
