@@ -16,8 +16,14 @@ https://www.postgresql.org/download/
 Guardar credenciales (superusuario, base de datos, contraseña, Puerto escogido)
 
 Crear una base de datos por medio de la interfaz grafica (pgadmin4)
-
-El nombre de la base de datos (usuarios) debe coincidir con el de la variable base de datos del archivo app.py linea 12
+## Configuración base de datos
+la configuración de la base de datos debe ser:
+```
+nombre de usuario: 'postgres'
+contraseña: 'Kibernum'
+nombre base de datos: 'usuarios'
+```
+En caso de no querer forzar estos datos, puede dirigirse a las lineas 10-12 y configurar 
 ## Github
 Abrir powershell y usar el siguiente comando para clonar
 ```powershell
