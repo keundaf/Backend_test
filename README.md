@@ -62,7 +62,7 @@ metodo POST con json a endpoint http://localhost:5000/usuarios
 	"Fecha_nacimiento":"1988-12-09"
 }
 ```
-Crea un usuario si cumple con todos los requisitos. En caso de no cumplirse algun requisito se retorna un json con la razón
+Crea un usuario si cumple con todos los requisitos. En caso de no cumplirse algun requisito se retorna un json con la razón.
 
 ---------------
 ## Consultar datos de un usuario (GET)
